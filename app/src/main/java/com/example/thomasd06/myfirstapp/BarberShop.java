@@ -41,6 +41,6 @@ public class BarberShop {
 
     @Override
     public String toString() {
-        return getShopName() + " Barbershop" + ";" + " Location:" + getShopLocation()+ "\n";
+        return getShopName() + " Barbershop" + "\n" +"Location: " + getShopLocation()+ "\n";
     }
 }

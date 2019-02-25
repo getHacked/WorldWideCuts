@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,17 +20,17 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.DataQueryBuilder;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
     private EditText searchBar;
     private Button enterButton;
-    private boolean isBarber;
-    private TextView searchResults;
-    private EditText barbershopRating;
-    private EditText barbershopLocation;
-    private BarberShop newBarbershop;
-    private List <String> currentBarbershop;
+    ArrayAdapter<BarberShop> adapter;
+    List<BarberShop> shops;
+
+
 
     @Nullable
     @Override
@@ -38,33 +39,20 @@ public class SearchFragment extends Fragment {
 
         searchBar = view.findViewById(R.id.search_bar);
         enterButton = view.findViewById(R.id.enter_button);
-        searchResults = view.findViewById(R.id.search_results);
-        barbershopLocation = view.findViewById(R.id.barbershop_location);
-        barbershopRating = view.findViewById(R.id.barbershop_rating);
-        barbershopLocation.setVisibility(view.INVISIBLE);
-        barbershopRating.setVisibility(view.INVISIBLE);
+
+
+        final ListView listView = view.findViewById(R.id.search_results);
+        shops = new ArrayList<>();
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, shops);
+        listView.setAdapter(adapter);
+
 
         Bundle args = getArguments();
-        if (args != null) {
-            Log.d("HomeFragment", args.toString());
-            isBarber = args.getBoolean("IS_BARBER");
-
-        }
-
-        if (isBarber) {
-            searchBar.setHint("Enter barbershop name");
-            barbershopRating.setVisibility(view.VISIBLE);
-            barbershopLocation.setVisibility(view.VISIBLE);
-        }
 
         enterButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 final String searchBarText = searchBar.getText().toString();
 
-
-
-
-                if (!isBarber) {
 
                     if(!searchBarText.isEmpty()){
                         DataQueryBuilder query = DataQueryBuilder.create();
@@ -74,11 +62,9 @@ public class SearchFragment extends Fragment {
                             @Override
                             public void handleResponse(List<BarberShop> response) {
                                 Log.d("HomeFragment", response.toString());
-                                if(response.isEmpty()){
-                                    searchResults.setText("It appears we don't have that barbershop in our database");
-                                }else{
-                                    searchResults.setText(response.toString() + " Are any of these the barbershop you're looking for?");
-                                }
+                                shops.clear();
+                                shops.addAll(response);
+                                adapter.notifyDataSetChanged();
                             }
 
                             @Override
@@ -92,35 +78,8 @@ public class SearchFragment extends Fragment {
 
 
 
-                } else {
-                    String name = searchBarText;
-                    String location = barbershopLocation.getText().toString();
-                    double rating = Double.parseDouble(barbershopRating.getText().toString());
 
-                    newBarbershop = new BarberShop(name, location, rating);
-
-
-                    searchResults.setText(name + " has been successfully added to the WWC database");
-
-
-                    Backendless.Persistence.save(newBarbershop, new AsyncCallback<BarberShop>() {
-                        @Override
-                        public void handleResponse(BarberShop response) {
-
-                        }
-
-                        @Override
-                        public void handleFault(BackendlessFault fault) {
-
-                        }
-                    });
-
-
-
-
-                }
-            }
-        });
-        return view;
     }
-}
+});
+        return view;
+    }}

@@ -31,6 +31,31 @@
         android:inputType="textPersonName"
         android:visibility="gone" />
 
+    <EditText
+        android:id="@+id/et_barbershop_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Barbershop name"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/et_barbershop_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Barbershop location"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/et_barbershop_rating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Self rating, 1-5"
+        android:inputType= "number"
+        android:visibility="gone" />
+
+
+
+
 
     <Button
         android:id="@+id/btn_log_in"

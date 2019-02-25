@@ -2,13 +2,19 @@ package com.example.thomasd06.myfirstapp;
 
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +29,12 @@ public class LoginActivity extends AppCompatActivity {
     private Button logInButton, signUpButton;
     private CheckBox isBarberCheckbox;
     private boolean isBarber;
+    private EditText barbershopRating;
+    private EditText barbershopLocation;
+    private EditText barbershopName;
+    private BarberShop newBarbershop;
+
+
 
 
     public static final String APPLICATION_ID = "F0453682-38B0-4EC8-FFE7-219A98811900";
@@ -31,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_activity);
@@ -43,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
         nameEditText = findViewById(R.id.et_name);
         signUpTextView = findViewById(R.id.tv_sign_up);
         isBarberCheckbox = findViewById(R.id.cb_is_barber);
+        barbershopLocation = findViewById(R.id.et_barbershop_location);
+        barbershopRating = findViewById(R.id.et_barbershop_rating);
+        barbershopName = findViewById(R.id.et_barbershop_name);
 
         String loggedInUser = Backendless.UserService.loggedInUser();
 
@@ -84,8 +100,8 @@ public class LoginActivity extends AppCompatActivity {
                         Log.e("LoginActivity", fault.toString());
                     }
 
-
                 });
+
             }
         });
 
@@ -109,12 +125,24 @@ public class LoginActivity extends AppCompatActivity {
                     user.setProperty("name", name);
                     user.setProperty("isBarber", isBarberCheckbox.isChecked());
 
+                    String shopName = barbershopName.getText().toString();
+                    String location = barbershopLocation.getText().toString();
+                    double rating = 0;
+                    String ratingString = barbershopRating.getText().toString();
+                    if(!ratingString.isEmpty()){
+                        rating = Double.parseDouble(ratingString);
+                    }
+
+                    newBarbershop = new BarberShop(shopName, location, rating);
+
+
 
                     Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>() {
                         @Override
                         public void handleResponse(BackendlessUser response) {
                             Toast.makeText(LoginActivity.this, response.getEmail() + " was registered", Toast.LENGTH_SHORT).show();
                             setUpLogIn();
+
                         }
 
                         @Override
@@ -122,14 +150,51 @@ public class LoginActivity extends AppCompatActivity {
                             Log.e("LoginActivity", fault.toString());
                         }
                     });
+
+                    Backendless.Persistence.save(newBarbershop, new AsyncCallback<BarberShop>() {
+                        @Override
+                        public void handleResponse(BarberShop response) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault) {
+
+                        }
+                    });
                 }
 
-                emailEditText.getText().clear();
-                passwordEditText.getText().clear();
-                nameEditText.getText().clear();
+
 
             }
         });
+        isBarberCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    barbershopRating.setVisibility(View.VISIBLE);
+                    barbershopLocation.setVisibility(View.VISIBLE);
+                    barbershopName.setVisibility(View.VISIBLE);
+
+
+                }else{
+                    barbershopRating.setVisibility(View.GONE);
+                    barbershopLocation.setVisibility(View.GONE);
+                    barbershopName.setVisibility(View.GONE);
+
+
+                }
+
+            }
+        });
+
+        emailEditText.getText().clear();
+        passwordEditText.getText().clear();
+        nameEditText.getText().clear();
+        barbershopRating.getText().clear();
+        barbershopLocation.getText().clear();
+        barbershopName.getText().clear();
 
 
         signUpTextView = findViewById(R.id.tv_sign_up);
@@ -163,6 +228,9 @@ public class LoginActivity extends AppCompatActivity {
         logInButton.setVisibility(View.GONE);
         isBarberCheckbox.setVisibility(View.VISIBLE);
         signUpTextView.setText("Cancel Sign Up!");
+        barbershopLocation.setVisibility(View.GONE);
+        barbershopRating.setVisibility(View.GONE);
+        barbershopName.setVisibility(View.GONE);
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.thomasd06.myfirstapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -26,7 +27,6 @@ public class MainActivity extends AppCompatActivity
 
 
     public String TAG = "MainActivity";
-
     private EditText searchBar;
     private Button enterButton;
     private boolean isBarber;
@@ -65,12 +65,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        boolean isBarber = (boolean) Backendless.UserService.CurrentUser().getProperty("isBarber");
-        if(isBarber){
-
-        }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, new HomeFragment());
+        ft.replace(R.id.fragment_container, new SearchFragment());
         ft.commit();
 
     }
@@ -107,7 +103,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
 
@@ -119,10 +115,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_privacy) {
 
-        } else if (id == R.id.nav_imabarber) {
-            fragment = new BarberFragment();
         }
-
         if(fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, fragment);
@@ -141,14 +134,16 @@ public class MainActivity extends AppCompatActivity
 
 
     public void goBackToHomeScreen(boolean isBarber){
-        Fragment homeFragment = new HomeFragment();
+        Fragment fragment = new SearchFragment();
         Bundle bundle = new Bundle();
         bundle.putBoolean("IS_BARBER", isBarber);
-        homeFragment.setArguments(bundle);
+        fragment.setArguments(bundle);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, homeFragment);
+        ft.replace(R.id.fragment_container, fragment);
         ft.commit();
 
     }
 
 }
+//git commit -m "Message"
+// git push
